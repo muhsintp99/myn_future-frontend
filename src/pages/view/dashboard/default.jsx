@@ -371,14 +371,15 @@ export default function DashboardDefault() {
     dispatch(getGalleries());
   }, [dispatch]);
 
-  // Current counts
-  const followUpCount = followUps?.length || 0;
-  const contactsCount = contacts?.length || 0;
-  const coursesCount = courses?.length || 0;
-  const collegesCount = colleges?.length || 0;
-  const servicesCount = services?.length || 0;
-  const blogsCount = blogs?.length || '-';
-  const galleriesCount = galleries?.length || '-';
+  // ✅ Safe counts (default to 0 if undefined)
+  const enquiryCountSafe = enquiryCount ?? 0;
+  const followUpCount = followUps?.length ?? 0;
+  const contactsCount = contacts?.length ?? 0;
+  const coursesCount = courses?.length ?? 0;
+  const collegesCount = colleges?.length ?? 0;
+  const servicesCount = services?.length ?? 0;
+  const blogsCount = blogs?.length ?? 0;
+  const galleriesCount = galleries?.length ?? 0;
 
   // Previous mock data
   const previousData = {
@@ -404,9 +405,9 @@ export default function DashboardDefault() {
   const metrics = [
     {
       title: 'Enquiries',
-      count: enquiryCount.toString(),
+      count: enquiryCountSafe.toString(),
       icon: Assignment,
-      ...getMetric(enquiryCount, previousData.enquiries)
+      ...getMetric(enquiryCountSafe, previousData.enquiries)
     },
     {
       title: 'Follow Ups',
@@ -435,20 +436,17 @@ export default function DashboardDefault() {
     {
       title: 'Services',
       count: servicesCount.toString(),
-      icon: SpaceDashboard,
-      // ...getMetric(servicesCount, previousData.services)
+      icon: SpaceDashboard
     },
     {
       title: 'Blogs',
       count: blogsCount.toString(),
-      icon: RssFeed,
-      // ...getMetric(blogsCount, previousData.blogs)
+      icon: RssFeed
     },
     {
       title: 'Gallery',
       count: galleriesCount.toString(),
-      icon: Collections,
-      // ...getMetric(galleriesCount, previousData.galleries)
+      icon: Collections
     }
   ];
 
@@ -467,8 +465,8 @@ export default function DashboardDefault() {
             />
           </Grid>
         ))}
-
       </Grid>
+
       <Grid container spacing={2} mt={3}>
         <Grid item md={12} lg={12}>
           <OrdersTable />

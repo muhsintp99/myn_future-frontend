@@ -11,10 +11,12 @@ import ContactActionWatcher from '../pages/container/contact/saga';
 import CollegeActionWatcher from '../pages/container/colleges/saga';
 import CourseActionWatcher from '../pages/container/courses/saga';
 import IntakeActionWatcher from '../pages/container/intake/saga';
+import StateActionWatcher from '../pages/container/states/saga';
 
 function* rootSaga() {
   yield all([
     call(LoginActionWatcher),
+    call(StateActionWatcher),
     call(CountrySagaWatcher),
     call(GalleryActionWatcher),
     call(BlogActionWatcher),

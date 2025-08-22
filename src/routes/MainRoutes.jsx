@@ -29,6 +29,7 @@ const Gallery = Loadable(lazy(() => import('../pages/view/gallery/index')));
 
 // render - Support
 const MyTeam = Loadable(lazy(() => import('../pages/view/support/index')));
+const State = Loadable(lazy(() => import('../pages/view/state/index')));
 const Country = Loadable(lazy(() => import('../pages/view/country/index')));
 
 // render - color
@@ -113,6 +114,10 @@ const MainRoutes = {
     {
       path: 'my-team',
       element: <MyTeam />
+    },
+    {
+      path: 'state',
+      element: <State />
     },
     {
       path: 'country',

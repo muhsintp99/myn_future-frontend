@@ -4,6 +4,7 @@ import { combineReducers } from 'redux';
 // project import
 import loginReducer from 'container/LoginContainer/slice';
 import countryReducer from '../../pages/container/country/slice';
+import statesReducer from '../../pages/container/states/slice';
 import galleryReducer from '../../pages/container/gallery/slice'
 import blogReducer from '../../pages/container/blog/slice';
 import serviceReducer from '../../pages/container/service/slice';
@@ -21,6 +22,7 @@ const reducers = combineReducers({
     menu,
     login: loginReducer,
     country: countryReducer,
+    states: statesReducer,
     gallery: galleryReducer,
     services: serviceReducer,
     blog: blogReducer,
