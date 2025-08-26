@@ -26,7 +26,7 @@ const support = {
     // },
     {
       id: 'state',
-      title: 'State',
+      title: 'Places',
       type: 'item',
       url: '/state',
       icon: icons.Public
