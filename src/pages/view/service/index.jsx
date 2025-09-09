@@ -2,7 +2,6 @@ import { useEffect, useState, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import {
   addService,
-  deleteService,
   hardDeleteService,
   getServiceById,
   updateService,
@@ -38,16 +37,15 @@ const Index = () => {
   const [editData, setEditData] = useState(null);
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
   const [deleteData, setDeleteData] = useState(null);
-  const [deleteType, setDeleteType] = useState('soft'); // 'soft' or 'hard'
 
   const dispatch = useDispatch();
-const { services, serviceCount, selectedService, loading, error } = useSelector((state) => state.services);
-
-  console.log("Redux state.services:", services);
+  const { services, serviceCount, selectedService, loading, error } = useSelector(
+    (state) => state.services
+  );
 
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
-  const title = 'Services';
+  const title = 'Education Blog';
 
   useEffect(() => {
     dispatch(getServices());
@@ -68,34 +66,22 @@ const { services, serviceCount, selectedService, loading, error } = useSelector(
     setOpenDialog(true);
   };
 
-  const handleDelete = (row, type = 'soft') => {
+  const handleDelete = (row) => {
     setDeleteData(row);
-    setDeleteType(type);
     setOpenDeleteDialog(true);
   };
 
   const handleDeleteConfirm = (data) => {
     if (data && data._id) {
-      if (deleteType === 'hard') {
-        dispatch(hardDeleteService(data._id));
-      } else {
-        dispatch(deleteService(data._id));
-      }
+      dispatch(hardDeleteService(data._id));
       setOpenDeleteDialog(false);
       setDeleteData(null);
-      setDeleteType('soft');
     }
   };
 
   const handleSubmitForm = (values) => {
     const payload = {
       title: values.title || '',
-      shortDesc: values.shortDesc || '',
-      fullDesc: values.fullDesc || '',
-      createdBy: values.createdBy || 'admin',
-      updatedBy: values.updatedBy || 'admin',
-      image: values.image,
-      points: values.points || [],
     };
 
     if (editData && editData._id) {
@@ -107,66 +93,25 @@ const { services, serviceCount, selectedService, loading, error } = useSelector(
     setEditData(null);
   };
 
-const rows = useMemo(() => {
-  const validServices = Array.isArray(services) ? services.filter(item => item && typeof item === 'object') : [];
-  if (!Array.isArray(services)) {
-    console.warn('Redux state.services is not an array:', services);
-  }
-  return validServices
-    .filter(
-      (item) =>
-        item && 
-        (
-          (item.title || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
-          (item.shortDesc || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
-          (item.fullDesc || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
-          (item.points?.some(
-            (point) =>
-              point && 
-              (
-                (point.title || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
-                (point.description || '').toLowerCase().includes(searchQuery.toLowerCase())
-              )
-          ) || false)
-        )
-    )
-    .map((item, index) => ({
-      ...item,
-      id: index + 1 ||item._id , // Prefer _id, fallback to index
-    }));
-}, [services, searchQuery]);
+  const rows = useMemo(() => {
+    const validServices = Array.isArray(services)
+      ? services.filter((item) => item && typeof item === 'object')
+      : [];
+    return validServices
+      .filter((item) =>
+        (item.title || '').toLowerCase().includes(searchQuery.toLowerCase())
+      )
+      .map((item, index) => ({
+        ...item,
+        id: index + 1 || item._id ,
+      }));
+  }, [services, searchQuery]);
 
   const memoizedEditData = useMemo(() => editData, [editData]);
 
   const columns = [
-    { field: 'id', headerName: 'S.No', flex: 0.4, align: 'center', headerAlign: 'center' },
-    {
-      field: 'image',
-      headerName: 'Image',
-      flex: 1,
-      renderCell: (params) =>
-        params.value ? (
-          <Box sx={{ display: 'flex', alignItems: 'center', width: '100%', height: '100%' }}>
-            <img
-              src={params.value}
-              alt="Service Image"
-              style={{ width: 50, height: 50, objectFit: 'cover', borderRadius: 4 }}
-            />
-          </Box>
-        ) : (
-          <Typography variant="body2">No Image</Typography>
-        ),
-    },
+    { field: 'id', headerName: 'S.No', flex: 0.2, align: 'center', headerAlign: 'center' },
     { field: 'title', headerName: 'Title', flex: 1 },
-    { field: 'shortDesc', headerName: 'Short Description', flex: 1 },
-    {
-      field: 'points',
-      headerName: 'Points',
-      flex: 1,
-      renderCell: (params) => (
-        <Typography style={{ lineHeight: 3.50 }}>{params.value?.length || 0} Points</Typography>
-      ),
-    },
     {
       field: 'action',
       headerName: 'Actions',
@@ -178,7 +123,7 @@ const rows = useMemo(() => {
           <FormOutlined style={pageStyles.editIcon} onClick={() => handleEdit(params.row)} />
           <DeleteOutlined
             style={{ ...pageStyles.deleteIcon, color: 'red' }}
-            onClick={() => handleDelete(params.row, 'hard')}
+            onClick={() => handleDelete(params.row)}
           />
         </>
       ),
@@ -187,9 +132,14 @@ const rows = useMemo(() => {
 
   return (
     <Box sx={pageStyles.mainBox}>
-      <Typography variant="h4" sx={pageStyles.title}>{title}</Typography>
+      <Typography variant="h4" sx={pageStyles.title}>
+        {title}
+      </Typography>
       <Typography component="p" sx={pageStyles.countList}>
-        <span style={{ color: '#234155', fontWeight: 600 }}>{serviceCount} {title}</span> are listed below
+        <span style={{ color: '#234155', fontWeight: 600 }}>
+          {serviceCount} {title}
+        </span>{' '}
+        are listed below
       </Typography>
       {error && (
         <Typography variant="body2" color="error" sx={{ mt: 2 }}>
@@ -203,7 +153,7 @@ const rows = useMemo(() => {
           <TextField
             fullWidth
             variant="outlined"
-            placeholder="Search by Title, Short Description, Full Description, Link, Points"
+            placeholder="Search by Title"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             InputProps={{
@@ -242,13 +192,13 @@ const rows = useMemo(() => {
 
       {loading && (
         <Typography variant="body2" sx={{ mt: 2 }}>
-          Loading services...
+          Loading Education Blog...
         </Typography>
       )}
 
       {!loading && rows.length === 0 && (
         <Typography variant="body2" sx={{ mt: 2 }}>
-          No services found.
+          No Education Blog found.
         </Typography>
       )}
 
@@ -275,22 +225,16 @@ const rows = useMemo(() => {
         editData={memoizedEditData}
       />
 
-      <View
-        open={isDrawerOpen}
-        onClose={() => setIsDrawerOpen(false)}
-        data={selectedService}
-      />
+      <View open={isDrawerOpen} onClose={() => setIsDrawerOpen(false)} data={selectedService} />
 
       <DeleteModel
         open={openDeleteDialog}
         onClose={() => {
           setOpenDeleteDialog(false);
           setDeleteData(null);
-          setDeleteType('soft');
         }}
         data={deleteData}
         onConfirm={handleDeleteConfirm}
-        deleteType={deleteType}
       />
     </Box>
   );
