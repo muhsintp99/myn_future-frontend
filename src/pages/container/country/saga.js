@@ -145,11 +145,6 @@ function* deleteCountrySaga(action) {
   try {
     const { id, name } = action.payload;
 
-    if (name?.toLowerCase() === 'india') {
-      toast.error('Cannot delete India');
-      return;
-    }
-
     const params = {
       api: `${config.configApi}/countries/${action.payload}`,
       method: 'DELETE',

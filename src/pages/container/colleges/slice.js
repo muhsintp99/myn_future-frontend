@@ -154,6 +154,7 @@
 
 // --------------------------------------------------------------------------------------------------------
 
+
 import { createSlice } from '@reduxjs/toolkit';
 
 const collegeSlice = createSlice({
@@ -286,27 +287,21 @@ const collegeSlice = createSlice({
 export const {
   clearError,
   clearSelectedCollege,
-
   addCollege,
   addCollegeSuccess,
   addCollegeFail,
-
   getColleges,
   getCollegesSuccess,
   getCollegesFail,
-
   getCollegeById,
   getCollegeByIdSuccess,
   getCollegeByIdFail,
-
   totalCount,
   totalCountSuccess,
   totalCountFail,
-
   updateCollege,
   updateCollegeSuccess,
   updateCollegeFail,
-
   deleteCollege,
   deleteCollegeSuccess,
   deleteCollegeFail,

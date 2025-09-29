@@ -60,7 +60,7 @@ const AddEdit = ({ open, onClose, onSubmit, editData, countries }) => {
                     >
                       {countries.map((country) => (
                         <MenuItem key={country._id} value={country._id}>
-                          {country.name}
+                          {country?.name}
                         </MenuItem>
                       ))}
                     </Field>

@@ -8,20 +8,39 @@ import {
   Box,
   CircularProgress,
   Grid,
+  Card,
+  CardContent,
+  Paper,
   Table,
   TableBody,
   TableCell,
   TableContainer,
   TableRow,
-  Paper,
-  Card,
-  CardContent,
   useTheme,
   useMediaQuery,
+  Chip,
+  Divider,
 } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import { useSelector } from 'react-redux';
 import FormatDate from '../../../utils/defult/FormatDate';
+
+const DetailRow = ({ label, value, isMobile }) => (
+  <TableRow>
+    <TableCell
+      component="th"
+      scope="row"
+      sx={{
+        fontWeight: 'bold',
+        width: isMobile ? '35%' : '25%',
+        backgroundColor: (theme) => theme.palette.grey[100],
+      }}
+    >
+      {label}
+    </TableCell>
+    <TableCell sx={{ wordBreak: 'break-word' }}>{value || 'N/A'}</TableCell>
+  </TableRow>
+);
 
 const View = ({ open, onClose, data }) => {
   const { loading, error } = useSelector((state) => state.enquiries);
@@ -39,6 +58,7 @@ const View = ({ open, onClose, data }) => {
         sx: {
           margin: isMobile ? 1 : 3,
           maxHeight: '90vh',
+          borderRadius: 3,
         },
       }}
     >
@@ -57,6 +77,7 @@ const View = ({ open, onClose, data }) => {
           <CloseIcon />
         </IconButton>
       </DialogTitle>
+
       <DialogContent dividers sx={{ p: isMobile ? 2 : 3 }}>
         {loading ? (
           <Box display="flex" justifyContent="center" py={4}>
@@ -66,6 +87,7 @@ const View = ({ open, onClose, data }) => {
           <Typography color="error">Error: {error}</Typography>
         ) : data ? (
           <Box>
+            {/* Quick Info Card */}
             <Card sx={{ mb: 3, backgroundColor: theme.palette.grey[50] }}>
               <CardContent>
                 <Grid container spacing={2}>
@@ -89,191 +111,76 @@ const View = ({ open, onClose, data }) => {
                     <Typography variant="caption" color="textSecondary">
                       Phone
                     </Typography>
-                    <Typography variant="h6">
-                      {data.mobile ? (
-                        <Typography
-                          component="a"
-                          href={`tel:${data.mobile}`}
-                          variant="h6"
-                          sx={{
-                            color: 'primary.main',
-                            textDecoration: 'none',
-                            '&:hover': {
-                              textDecoration: 'underline',
-                              color: 'primary.dark',
-                            },
-                          }}
-                        >
-                          {data.mobile}
-                        </Typography>
-                      ) : (
-                        'N/A'
-                      )}
+                    <Typography
+                      component="a"
+                      href={data.mobile ? `tel:${data.mobile}` : '#'}
+                      variant="h6"
+                      sx={{
+                        color: data.mobile ? 'primary.main' : 'text.primary',
+                        textDecoration: 'none',
+                        '&:hover': { textDecoration: data.mobile ? 'underline' : 'none' },
+                      }}
+                    >
+                      {data.mobile || 'N/A'}
                     </Typography>
                   </Grid>
                   <Grid item xs={12} sm={6} md={3}>
                     <Typography variant="caption" color="textSecondary">
                       Email
                     </Typography>
-                    <Typography variant="h6" sx={{ wordBreak: 'break-word' }}>
-                      {data.email ? (
-                        <Typography
-                          component="a"
-                          href={`mailto:${data.email}`}
-                          variant="h6"
-                          sx={{
-                            color: 'primary.main',
-                            textDecoration: 'none',
-                            wordBreak: 'break-word',
-                            '&:hover': {
-                              textDecoration: 'underline',
-                              color: 'primary.dark',
-                            },
-                          }}
-                        >
-                          {data.email}
-                        </Typography>
-                      ) : (
-                        'N/A'
-                      )}
-                    </Typography>
-                  </Grid>
-                  <Grid item xs={12} sm={6} md={4}>
-                    <Typography variant="caption" color="textSecondary">
-                      Location
-                    </Typography>
-                    <Typography variant="h6">
-                      {data.location || 'N/A'}
+                    <Typography
+                      component="a"
+                      href={data.email ? `mailto:${data.email}` : '#'}
+                      variant="h6"
+                      sx={{
+                        color: data.email ? 'primary.main' : 'text.primary',
+                        wordBreak: 'break-word',
+                        textDecoration: 'none',
+                        '&:hover': { textDecoration: data.email ? 'underline' : 'none' },
+                      }}
+                    >
+                      {data.email || 'N/A'}
                     </Typography>
                   </Grid>
                 </Grid>
               </CardContent>
             </Card>
 
+            <Divider sx={{ mb: 2 }} />
+
+            {/* Detailed Table */}
             <TableContainer component={Paper} variant="outlined">
               <Table>
                 <TableBody>
-                  <TableRow>
-                    <TableCell
-                      component="th"
-                      scope="row"
-                      sx={{
-                        fontWeight: 'bold',
-                        width: isMobile ? '35%' : '25%',
-                        backgroundColor: theme.palette.grey[100],
-                      }}
-                    >
-                      Lead Quality
-                    </TableCell>
-                    <TableCell sx={{ wordBreak: 'break-word' }}>
-                      {data.leadQuality || 'N/A'}
-                    </TableCell>
-                  </TableRow>
-                  <TableRow>
-                    <TableCell
-                      component="th"
-                      scope="row"
-                      sx={{
-                        fontWeight: 'bold',
-                        backgroundColor: theme.palette.grey[100],
-                      }}
-                    >
-                      Category
-                    </TableCell>
-                    <TableCell>
-                      {data.category || 'N/A'}
-                    </TableCell>
-                  </TableRow>
-                  <TableRow>
-                    <TableCell
-                      component="th"
-                      scope="row"
-                      sx={{
-                        fontWeight: 'bold',
-                        backgroundColor: theme.palette.grey[100],
-                      }}
-                    >
-                      Course
-                    </TableCell>
-                    <TableCell>
-                      {data.course.title || 'N/A'}
-                    </TableCell>
-                  </TableRow>
-                  <TableRow>
-                    <TableCell
-                      component="th"
-                      scope="row"
-                      sx={{
-                        fontWeight: 'bold',
-                        backgroundColor: theme.palette.grey[100],
-                      }}
-                    >
-                      School
-                    </TableCell>
-                    <TableCell>
-                      {data.school.name || 'N/A'}
-                    </TableCell>
-                  </TableRow>
-                  <TableRow>
-                    <TableCell
-                      component="th"
-                      scope="row"
-                      sx={{
-                        fontWeight: 'bold',
-                        backgroundColor: theme.palette.grey[100],
-                      }}
-                    >
-                      Looking For
-                    </TableCell>
-                    <TableCell sx={{ wordBreak: 'break-word' }}>
-                      {data.lookingFor || 'N/A'}
-                    </TableCell>
-                  </TableRow>
-                  <TableRow>
-                    <TableCell
-                      component="th"
-                      scope="row"
-                      sx={{
-                        fontWeight: 'bold',
-                        backgroundColor: theme.palette.grey[100],
-                      }}
-                    >
-                      Enquiry Description
-                    </TableCell>
-                    <TableCell sx={{ wordBreak: 'break-word' }}>
-                      {data.enqDescp || 'N/A'}
-                    </TableCell>
-                  </TableRow>
-                  <TableRow>
-                    <TableCell
-                      component="th"
-                      scope="row"
-                      sx={{
-                        fontWeight: 'bold',
-                        backgroundColor: theme.palette.grey[100],
-                      }}
-                    >
-                      Remarks
-                    </TableCell>
-                    <TableCell sx={{ wordBreak: 'break-word' }}>
-                      {data.remarks || 'N/A'}
-                    </TableCell>
-                  </TableRow>
-                  <TableRow>
-                    <TableCell
-                      component="th"
-                      scope="row"
-                      sx={{
-                        fontWeight: 'bold',
-                        backgroundColor: theme.palette.grey[100],
-                      }}
-                    >
-                      Created At
-                    </TableCell>
-                    <TableCell>
-                      {FormatDate(data.createdAt)}
-                    </TableCell>
-                  </TableRow>
+                  <DetailRow label="Location" value={data.location} isMobile={isMobile} />
+                  <DetailRow
+                    label="Lead Quality"
+                    value={<Chip label={data.leadQuality || 'N/A'} color="info" />}
+                    isMobile={isMobile}
+                  />
+                  <DetailRow label="Category" value={data.category} isMobile={isMobile} />
+
+                  {/* ✅ Show Populated Course Title & School Name */}
+                  <DetailRow
+                    label="Course"
+                    value={data.course?.title || 'N/A'}
+                    isMobile={isMobile}
+                  />
+                  <DetailRow
+                    label="College / School"
+                    value={data.school?.name || 'N/A'}
+                    isMobile={isMobile}
+                  />
+
+                  <DetailRow label="Enquiry Description" value={data.enqDescp} isMobile={isMobile} />
+                  <DetailRow label="Remarks" value={data.remarks} isMobile={isMobile} />
+                  <DetailRow
+                    label="Status"
+                    value={<Chip label={data.status || 'N/A'} color={data.status === 'active' ? 'success' : 'default'} />}
+                    isMobile={isMobile}
+                  />
+                  
+                  <DetailRow label="Time" value={FormatDate(data.createdAt)} isMobile={isMobile} />
                 </TableBody>
               </Table>
             </TableContainer>

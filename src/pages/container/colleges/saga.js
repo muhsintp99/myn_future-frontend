@@ -159,11 +159,11 @@ import commonApi from '../../../container/api';
 import config from '../../../config';
 import * as actions from './slice';
 
-// Convert payload to FormData (handle arrays & files properly)
+// Convert payload to FormData (handle arrays as arrays)
 function createCollegeFormData(payload) {
   const formData = new FormData();
   Object.keys(payload).forEach(key => {
-    if (key === 'id') return; // exclude ID from body
+    if (key === 'id') return;
 
     const value = payload[key];
     if (value !== null && value !== undefined && value !== '') {
@@ -172,17 +172,29 @@ function createCollegeFormData(payload) {
           const courseId = typeof course === 'object' ? course._id : course;
           if (courseId) formData.append(`courses[${index}]`, courseId);
         });
-      } else if (Array.isArray(value)) {
+      } else if (key === 'category' && Array.isArray(value)) {
         value.forEach((item, index) => {
-          formData.append(`${key}[${index}]`, item);
+          formData.append(`category[${index}]`, item);
+        });
+      } else if (key === 'facilities' && Array.isArray(value)) {
+        value.forEach((item, index) => {
+          formData.append(`facilities[${index}]`, item);
+        });
+      } else if (key === 'services' && Array.isArray(value)) {
+        value.forEach((item, index) => {
+          formData.append(`services[${index}]`, item);
         });
       } else if (key === 'image' && value instanceof File) {
         formData.append(key, value);
       } else {
         formData.append(key, value);
       }
+    } else if (key === 'facilities' || key === 'services') {
+      // Explicitly include empty arrays for facilities and services
+      formData.append(key, JSON.stringify([]));
     }
   });
+  console.log('FormData payload:', Object.fromEntries(formData)); // Debug payload
   return formData;
 }
 
@@ -192,6 +204,8 @@ function* getCollegesSaga(action) {
     const queryParams = action.payload ? new URLSearchParams(action.payload).toString() : '';
     const apiUrl = `${config.configApi}/college${queryParams ? `?${queryParams}` : ''}`;
     const response = yield call(commonApi, { api: apiUrl, method: 'GET', authorization: false });
+    
+    console.log('getColleges response:', response); // Debug response
 
     const { colleges, total, totalPages, currentPage } = response;
     const pagination = { total, totalPages, currentPage };
@@ -199,6 +213,7 @@ function* getCollegesSaga(action) {
     yield put(actions.getCollegesSuccess({ colleges, pagination }));
   } catch (error) {
     const errorMessage = error.response?.data?.error || 'Failed to fetch colleges';
+    console.error('getColleges error:', errorMessage); // Debug error
     yield put(actions.getCollegesFail(errorMessage));
     toast.error(errorMessage);
   }
@@ -212,9 +227,12 @@ function* getCollegeByIdSaga(action) {
       method: 'GET',
       authorization: false,
     });
+    
+    console.log('getCollegeById response:', response); // Debug response
     yield put(actions.getCollegeByIdSuccess(response));
   } catch (error) {
     const errorMessage = error.response?.data?.error || 'Failed to fetch college';
+    console.error('getCollegeById error:', errorMessage); // Debug error
     yield put(actions.getCollegeByIdFail(errorMessage));
     toast.error(errorMessage);
   }
@@ -231,11 +249,13 @@ function* addCollegeSaga(action) {
       body: formData,
     });
 
+    console.log('addCollege response:', response); // Debug response
     yield put(actions.addCollegeSuccess(response));
     yield put(actions.getColleges());
     toast.success('College added successfully');
   } catch (error) {
-    const errorMessage = error.response?.data?.error || 'Failed to add college / College already existing';
+    const errorMessage = error.response?.data?.error || 'Failed to add college';
+    console.error('addCollege error:', errorMessage); // Debug error
     yield put(actions.addCollegeFail(errorMessage));
     toast.error(errorMessage);
   }
@@ -254,17 +274,19 @@ function* updateCollegeSaga(action) {
       body: formData,
     });
 
+    console.log('updateCollege response:', response); // Debug response
     yield put(actions.updateCollegeSuccess(response));
     yield put(actions.getColleges());
     toast.success('College updated successfully');
   } catch (error) {
-    const errorMessage = error.response?.data?.error || 'Failed to add college / College already existing';
+    const errorMessage = error.response?.data?.error || 'Failed to update college';
+    console.error('updateCollege error:', errorMessage); // Debug error
     yield put(actions.updateCollegeFail(errorMessage));
     toast.error(errorMessage);
   }
 }
 
-// DELETE (hard delete)
+// DELETE
 function* deleteCollegeSaga(action) {
   try {
     yield call(commonApi, {
@@ -272,11 +294,14 @@ function* deleteCollegeSaga(action) {
       method: 'DELETE',
       authorization: false,
     });
+    
+    console.log('deleteCollege success for ID:', action.payload); // Debug success
     yield put(actions.deleteCollegeSuccess(action.payload));
     yield put(actions.getColleges());
     toast.success('College deleted successfully');
   } catch (error) {
     const errorMessage = error.response?.data?.error || 'Failed to delete college';
+    console.error('deleteCollege error:', errorMessage); // Debug error
     yield put(actions.deleteCollegeFail(errorMessage));
     toast.error(errorMessage);
   }
@@ -290,9 +315,12 @@ function* totalCountSaga() {
       method: 'GET',
       authorization: false,
     });
+    
+    console.log('totalCount response:', response); // Debug response
     yield put(actions.totalCountSuccess({ count: response.count || 0 }));
   } catch (error) {
     const errorMessage = error.response?.data?.error || 'Failed to fetch college count';
+    console.error('totalCount error:', errorMessage); // Debug error
     yield put(actions.totalCountFail(errorMessage));
     toast.error(errorMessage);
   }

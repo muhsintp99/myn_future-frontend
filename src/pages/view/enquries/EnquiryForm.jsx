@@ -27,6 +27,7 @@ import Message from '@mui/icons-material/Message';
 import { createEnquiry } from '../../container/enquries/slice';
 import { getAllCourses } from '../../container/courses/slice';
 import { getColleges } from '../../container/colleges/slice';
+import Logo from '../../../assets/images/logo/mynfutur/new icon.png'
 
 const EnquiryForm = () => {
   const dispatch = useDispatch();
@@ -143,6 +144,13 @@ const EnquiryForm = () => {
       }}
     >
       <Container maxWidth="lg" sx={{ background: 'transparent' }}>
+        <Box sx={{ mb: 4 }}>
+          <img
+            src={Logo}
+            alt="Myn Future Logo"
+            style={{ height: 60, display: 'block', margin: 'auto' }}
+          />
+        </Box>
         <Box textAlign="center" mb={4}>
           <Typography
             variant="h2"
@@ -175,13 +183,13 @@ const EnquiryForm = () => {
             <Box display="flex" alignItems="center">
               <Email sx={{ mr: 1, fontSize: '1.2rem' }} />
               <Typography variant="body1" fontWeight="500">
-                support@example.com
+                hello@mynfuture.com
               </Typography>
             </Box>
             <Box display="flex" alignItems="center">
               <Phone sx={{ mr: 1, fontSize: '1.2rem' }} />
               <Typography variant="body1" fontWeight="500">
-                +91 98765 43210
+               +91 7736 94 94 04
               </Typography>
             </Box>
           </Box>

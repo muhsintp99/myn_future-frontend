@@ -79,12 +79,11 @@ const Index = () => {
   // };
 
   const handleDeleteConfirm = (data) => {
-    if (data && data.name?.toLowerCase() === 'india') {
-      alert('Cannot delete India');
-      setOpenDeleteDialog(false);
-      setDeleteData(null);
-      return;
-    }
+
+    setOpenDeleteDialog(false);
+    setDeleteData(null);
+
+
 
     if (data && data._id) {
       dispatch(deleteCountry(data._id));
@@ -178,26 +177,20 @@ const Index = () => {
       sortable: false,
       renderCell: (params) => {
         const countryName = params.row.name?.toLowerCase();
-        const isIndia = countryName === 'india';
-
         return (
           <>
             <EyeOutlined
               style={pageStyles.viewIcon}
               onClick={() => handleView(params.row)}
             />
-            {!isIndia && (
-              <>
-                <FormOutlined
-                  style={pageStyles.editIcon}
-                  onClick={() => handleEdit(params.row)}
-                />
-                <DeleteOutlined
-                  style={pageStyles.deleteIcon}
-                  onClick={() => handleDelete(params.row)}
-                />
-              </>
-            )}
+            <FormOutlined
+              style={pageStyles.editIcon}
+              onClick={() => handleEdit(params.row)}
+            />
+            <DeleteOutlined
+              style={pageStyles.deleteIcon}
+              onClick={() => handleDelete(params.row)}
+            />
           </>
         );
       },

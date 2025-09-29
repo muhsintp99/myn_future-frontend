@@ -4,75 +4,70 @@ import {
   DialogTitle,
   DialogContent,
   DialogActions,
-  TextField,
   Button,
   Grid,
   Box,
-  Typography
+  Typography,
+  IconButton
 } from '@mui/material';
-import { Formik, Form, Field } from 'formik';
+import { Formik, Form } from 'formik';
 import * as Yup from 'yup';
+import CloseIcon from '@mui/icons-material/Close';
 
-// Validation schema based on gallery schema
-const validationSchema = Yup.object({
-  title: Yup.string().required('Title is required'),
-  from: Yup.string().required('From is required'),
-  link: Yup.string()
-    .nullable()
-    .matches(
-      /^(https?:\/\/)?([\w\-])+\.{1}([a-zA-Z]{2,63})([\/\w\-\.]*)*\/?$/,
-      { message: 'Enter a valid URL', excludeEmptyString: true }
-    ),
-  date: Yup.date().typeError('Invalid date format'),
-  image: Yup.mixed().nullable()
-    .test('fileType', 'Only image files are allowed', (value) => {
-      if (!value) return true; // Allow null/undefined
-      return value && ['image/jpeg', 'image/png', 'image/gif'].includes(value.type);
-    })
-});
+// Validation schema for multiple images
+const validationSchema = Yup.array()
+  .of(
+    Yup.mixed()
+      .test('fileType', 'Only image files (JPEG, PNG, GIF) are allowed', (value) => {
+        if (!value) return true;
+        return ['image/jpeg', 'image/png', 'image/gif'].includes(value.type);
+      })
+      .test('fileSize', 'Each image must be 5MB or less', (value) => {
+        if (!value) return true;
+        return value.size <= 5 * 1024 * 1024; // 5MB
+      })
+  )
+  .min(1, 'At least one image is required')
+  .max(10, 'Maximum 10 images allowed');
 
 const AddEdit = ({ open, onClose, onSubmit, editData }) => {
   const isEdit = Boolean(editData && editData._id);
-  const [previewImage, setPreviewImage] = useState(null);
+  const [previewImages, setPreviewImages] = useState([]);
+  const [imageFiles, setImageFiles] = useState([]);
 
   useEffect(() => {
-    if (editData?.image) {
-      setPreviewImage(editData.image);
+    if (isEdit && editData?.image) {
+      setPreviewImages([editData.image]);
+      setImageFiles([]); // In edit mode, new files start empty
     } else {
-      setPreviewImage(null);
+      setPreviewImages([]);
+      setImageFiles([]);
     }
-  }, [editData]);
+  }, [editData, isEdit]);
 
-  const initialValues = {
-    title: editData?.title || '',
-    from: editData?.from || '',
-    link: editData?.link || '',
-    date: editData?.date ? new Date(editData.date).toISOString().split('T')[0] : new Date().toISOString().split('T')[0],
-    image: null
+  const handleRemoveImage = (index, setFieldValue) => {
+    setPreviewImages((prev) => prev.filter((_, i) => i !== index));
+    setImageFiles((prev) => prev.filter((_, i) => i !== index));
+    setFieldValue('images', imageFiles.filter((_, i) => i !== index));
   };
 
-  // const handleSubmit = (values, { setSubmitting }) => {
-  //   console.log('Form submission values:', values);
-  //   onSubmit(values);
-  //   setSubmitting(false);
-  // };
-
-  const handleSubmit = (values, { setSubmitting }) => {
-    const formattedValues = {
-      ...values,
-      date: values.date ? new Date(values.date).toISOString() : new Date().toISOString(),
-    };
-    console.log('Form submission values:', formattedValues);
-    onSubmit(formattedValues);
+  const handleSubmit = (values, { setSubmitting, resetForm }) => {
+    if (isEdit) {
+      onSubmit({ image: values.images[0] });
+    } else {
+      onSubmit({ images: values.images });
+    }
     setSubmitting(false);
+    setPreviewImages([]);
+    setImageFiles([]);
+    resetForm();
   };
 
   return (
     <Dialog open={open} onClose={onClose} maxWidth="md" fullWidth>
-      <DialogTitle>{isEdit ? 'Edit Gallery Item' : 'Add New Gallery Item'}</DialogTitle>
-
+      <DialogTitle>{isEdit ? 'Edit Gallery Image' : 'Add New Gallery Images'}</DialogTitle>
       <Formik
-        initialValues={initialValues}
+        initialValues={{ images: [] }}
         validationSchema={validationSchema}
         onSubmit={handleSubmit}
         enableReinitialize
@@ -81,82 +76,38 @@ const AddEdit = ({ open, onClose, onSubmit, editData }) => {
           <Form>
             <DialogContent>
               <Grid container spacing={3}>
-                {/* Title */}
-                <Grid item xs={12} sm={6}>
-                  <Field
-                    as={TextField}
-                    name="title"
-                    label="Title *"
-                    fullWidth
-                    variant="outlined"
-                    error={touched.title && Boolean(errors.title)}
-                    helperText={touched.title && errors.title}
-                  />
-                </Grid>
-
-                {/* From */}
-                <Grid item xs={12} sm={6}>
-                  <Field
-                    as={TextField}
-                    name="from"
-                    label="From *"
-                    fullWidth
-                    variant="outlined"
-                    error={touched.from && Boolean(errors.from)}
-                    helperText={touched.from && errors.from}
-                  />
-                </Grid>
-
-                {/* Link */}
-                <Grid item xs={12} sm={6}>
-                  <Field
-                    as={TextField}
-                    name="link"
-                    label="Link"
-                    fullWidth
-                    variant="outlined"
-                    placeholder="e.g., https://example.com"
-                    error={touched.link && Boolean(errors.link)}
-                    helperText={touched.link && errors.link}
-                  />
-                </Grid>
-
-                {/* Date */}
-                <Grid item xs={12} sm={6}>
-                  <Field
-                    as={TextField}
-                    name="date"
-                    label="Date"
-                    type="date"
-                    fullWidth
-                    variant="outlined"
-                    InputLabelProps={{ shrink: true }}
-                    error={touched.date && Boolean(errors.date)}
-                    helperText={touched.date && errors.date}
-                  />
-                </Grid>
-
                 {/* Image Upload */}
-                <Grid item xs={12} sm={6}>
+                <Grid item xs={12}>
                   <Box>
                     <Typography variant="body2" sx={{ mb: 1 }}>
-                      Gallery Image
+                      Upload {isEdit ? 'Image' : 'Images (Max 10, JPEG/PNG/GIF, 5MB each)'}
                     </Typography>
                     <input
                       type="file"
-                      accept="image/*"
+                      accept="image/jpeg,image/png,image/gif"
+                      multiple={!isEdit}
                       onChange={(event) => {
-                        const file = event.currentTarget.files[0];
-                        setFieldValue('image', file);
-                        if (file) {
-                          const reader = new FileReader();
-                          reader.onloadend = () => {
-                            setPreviewImage(reader.result);
-                          };
-                          reader.readAsDataURL(file);
-                        } else {
-                          setPreviewImage(null);
+                        const files = Array.from(event.currentTarget.files);
+                        if (isEdit && files.length > 1) {
+                          alert('Only one image allowed in edit mode');
+                          return;
                         }
+                        if (!isEdit && files.length + imageFiles.length > 10) {
+                          alert('Maximum 10 images allowed');
+                          return;
+                        }
+                        setImageFiles((prev) => [...prev, ...files]);
+                        setFieldValue('images', [...imageFiles, ...files]);
+                        const previews = files.map((file) => {
+                          return new Promise((resolve) => {
+                            const reader = new FileReader();
+                            reader.onloadend = () => resolve(reader.result);
+                            reader.readAsDataURL(file);
+                          });
+                        });
+                        Promise.all(previews).then((results) => {
+                          setPreviewImages((prev) => isEdit ? results : [...prev, ...results]);
+                        });
                       }}
                       style={{
                         width: '100%',
@@ -165,46 +116,72 @@ const AddEdit = ({ open, onClose, onSubmit, editData }) => {
                         borderRadius: '4px'
                       }}
                     />
-                    {touched.image && errors.image && (
-                      <Typography color="error" variant="caption">
-                        {errors.image}
+                    {touched.images && errors.images && (
+                      <Typography color="error" variant="caption" sx={{ mt: 1 }}>
+                        {typeof errors.images === 'string' ? errors.images : 'Invalid image selection'}
                       </Typography>
                     )}
                   </Box>
                 </Grid>
 
-                {/* Show Preview Image */}
-                {previewImage && (
+                {/* Show Preview Images */}
+                {previewImages.length > 0 && (
                   <Grid item xs={12}>
                     <Box>
                       <Typography variant="body2" sx={{ mb: 1 }}>
-                        Preview:
+                        Preview ({previewImages.length} {previewImages.length === 1 ? 'image' : 'images'}):
                       </Typography>
-                      <img
-                        src={previewImage}
-                        alt="Gallery Preview"
-                        style={{
-                          width: 100,
-                          height: 100,
-                          objectFit: 'cover',
-                          borderRadius: 4,
-                          border: '1px solid #ccc'
-                        }}
-                      />
+                      <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
+                        {previewImages.map((src, index) => (
+                          <Box key={index} sx={{ position: 'relative' }}>
+                            <img
+                              src={src}
+                              alt={`Preview ${index + 1}`}
+                              style={{
+                                width: 100,
+                                height: 100,
+                                objectFit: 'cover',
+                                borderRadius: 4,
+                                border: '1px solid #ccc'
+                              }}
+                            />
+                            <IconButton
+                              size="small"
+                              sx={{
+                                position: 'absolute',
+                                top: 0,
+                                right: 0,
+                                bgcolor: 'rgba(255, 255, 255, 0.8)',
+                                '&:hover': { bgcolor: 'rgba(255, 255, 255, 1)' }
+                              }}
+                              onClick={() => handleRemoveImage(index, setFieldValue)}
+                            >
+                              <CloseIcon fontSize="small" color="error" />
+                            </IconButton>
+                          </Box>
+                        ))}
+                      </Box>
                     </Box>
                   </Grid>
                 )}
               </Grid>
             </DialogContent>
-
             <DialogActions sx={{ p: 3 }}>
-              <Button onClick={onClose} variant="outlined">
+              <Button
+                onClick={() => {
+                  onClose();
+                  setPreviewImages([]);
+                  setImageFiles([]);
+                  setFieldValue('images', []);
+                }}
+                variant="outlined"
+              >
                 Cancel
               </Button>
               <Button
                 type="submit"
                 variant="contained"
-                disabled={isSubmitting}
+                disabled={isSubmitting || !values.images.length}
                 sx={{ ml: 2 }}
               >
                 {isSubmitting ? 'Saving...' : isEdit ? 'Update' : 'Add'}

@@ -121,7 +121,7 @@ const Index = () => {
       headerName: 'Country',
       flex: 1,
       valueGetter: (params) => {
-        return `${params.name}-${params.code}`;
+        return `${params?.name}-${params?.code}`;
       },
     },
 

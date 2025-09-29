@@ -1,12 +1,14 @@
 import React from 'react';
 import {
-  Drawer, Typography, Box, IconButton, Grid
+  Drawer,
+  Typography,
+  Box,
+  IconButton,
+  Grid
 } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import ArrowRightIcon from '@mui/icons-material/ArrowRight';
 import { viewDrawerStyles } from '../../../assets/style/commen';
-
-const capitalize = (str) => str?.toLowerCase()?.replace(/\b\w/g, c => c.toUpperCase()) || '';
 
 const View = ({ open, onClose, data }) => {
   return (
@@ -16,10 +18,7 @@ const View = ({ open, onClose, data }) => {
       onClose={onClose}
       PaperProps={{
         sx: {
-          width: {
-            sm: data && Object.keys(data).length > 6 ? '90%' : '50%',
-            md: data && Object.keys(data).length > 6 ? '50%' : '30%',
-          }
+          width: { sm: '50%', md: '30%' }
         },
       }}
     >
@@ -33,69 +32,22 @@ const View = ({ open, onClose, data }) => {
           </Grid>
         </Box>
 
-        {data ? (
+        {data && data.image ? (
           <Grid container sx={viewDrawerStyles.dataContainer} mt={2}>
-            <Grid item xs={12} md={6}>
+            <Grid item xs={12}>
               <Box mb={2} style={{ display: 'flex' }}>
                 <ArrowRightIcon fontSize="small" />
                 <Box>
                   <Typography sx={viewDrawerStyles.label}><strong>Image</strong></Typography>
-                  {data.image ? (
+                  <Box sx={{ position: 'relative' }}>
                     <img
                       src={data.image}
-                      alt="gallery"
+                      alt={`Gallery Image`}
                       style={{ maxWidth: '200px', maxHeight: '160px', borderRadius: '4px', marginTop: '4px' }}
                     />
-                  ) : (
-                    <Typography>No Image</Typography>
-                  )}
+                  </Box>
                 </Box>
               </Box>
-
-              <Box mb={2} style={{ display: 'flex' }}>
-                <ArrowRightIcon fontSize="small" />
-                <Box>
-                  <Typography sx={viewDrawerStyles.label}><strong>Title</strong></Typography>
-                  <Typography sx={viewDrawerStyles.value}>{capitalize(data.title)}</Typography>
-                </Box>
-              </Box>
-
-              <Box mb={2} style={{ display: 'flex' }}>
-                <ArrowRightIcon fontSize="small" />
-                <Box>
-                  <Typography sx={viewDrawerStyles.label}><strong>From</strong></Typography>
-                  <Typography sx={viewDrawerStyles.value}>{capitalize(data.from)}</Typography>
-                </Box>
-              </Box>
-            </Grid>
-
-            <Grid item xs={12} md={6}>
-              <Box mb={2} style={{ display: 'flex' }}>
-                <ArrowRightIcon fontSize="small" />
-                <Box>
-                  <Typography sx={viewDrawerStyles.label}><strong>Link</strong></Typography>
-                  <Typography sx={viewDrawerStyles.value}>
-                    {data.link ? (
-                      <a href={data.link} target="_blank" rel="noopener noreferrer">
-                        {data.link}
-                      </a>
-                    ) : (
-                      'No Link'
-                    )}
-                  </Typography>
-                </Box>
-              </Box>
-
-              <Box mb={2} style={{ display: 'flex' }}>
-                <ArrowRightIcon fontSize="small" />
-                <Box>
-                  <Typography sx={viewDrawerStyles.label}><strong>Date</strong></Typography>
-                  <Typography sx={viewDrawerStyles.value}>
-                    {data.date ? new Date(data.date).toLocaleDateString() : 'N/A'}
-                  </Typography>
-                </Box>
-              </Box>
-
               <Box mb={2} style={{ display: 'flex' }}>
                 <ArrowRightIcon fontSize="small" />
                 <Box>
@@ -105,7 +57,6 @@ const View = ({ open, onClose, data }) => {
                   </Typography>
                 </Box>
               </Box>
-
             </Grid>
           </Grid>
         ) : (
