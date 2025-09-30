@@ -39,7 +39,7 @@ export default function LogoIcon() {
   return (
     <img
       src={logo}
-      alt="Edspiria"
+      alt="mynfutur"
       style={{ display: 'block', width: 'auto', height: '37px' }}
     />
   );

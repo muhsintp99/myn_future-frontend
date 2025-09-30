@@ -294,25 +294,22 @@ const Index = () => {
   const [viewData, setViewData] = useState(null);
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
   const [deleteData, setDeleteData] = useState(null);
-
   const [page, setPage] = useState(1);
-  const [limit] = useState(6); // page size
+  const [limit] = useState(10);
 
   const dispatch = useDispatch();
-
-  // ✅ destructure from reducer slice (colleges inside state.colleges)
   const { colleges = [], loading, error, pagination } = useSelector((state) => state.college);
 
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const title = 'Colleges';
 
-  // fetch on search or page change
+  // Fetch on search or page change
   useEffect(() => {
     dispatch(getColleges({ search: searchQuery, page, limit }));
   }, [dispatch, searchQuery, page, limit]);
 
-  // error toast
+  // Error toast
   useEffect(() => {
     if (error) {
       toast.error(error);
@@ -320,7 +317,7 @@ const Index = () => {
     }
   }, [error, dispatch]);
 
-  // handlers
+  // Handlers
   const handleOpenDialog = (college = null) => {
     setSelectedCollege(college);
     setOpenDialog(true);
@@ -389,11 +386,11 @@ const Index = () => {
         <TextField
           fullWidth
           variant="outlined"
-          placeholder="Search by Name, Email, Phone, Address, Country, or Course"
+          placeholder="Search by Name, Email, Phone, Address, Country, Course, Category, Facilities, or Services"
           value={searchQuery}
           onChange={(e) => {
             setSearchQuery(e.target.value);
-            setPage(1); // reset to first page on search
+            setPage(1); // Reset to first page on search
           }}
           InputProps={{
             endAdornment: (
@@ -441,9 +438,6 @@ const Index = () => {
             <Card sx={{ boxShadow: 3 }}>
               <CardContent>
                 <Typography variant="h6">{college.name}</Typography>
-                {/* <Typography variant="body2" color="text.secondary">
-                  Code: {college.code || 'N/A'}
-                </Typography> */}
               </CardContent>
 
               {college.image && (

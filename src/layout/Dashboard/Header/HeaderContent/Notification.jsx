@@ -59,7 +59,7 @@ export default function Notification() {
 
   // Setup SSE for real-time updates
   useEffect(() => {
-    const eventSource = new EventSource('http://localhost:5050/api/enquiries/stream');
+    const eventSource = new EventSource('https://api.mynfuture.com/api/enquiries/stream');
     eventSource.addEventListener('newEnquiry', (event) => {
       const data = JSON.parse(event.data);
       dispatch(addNotification({

@@ -276,13 +276,6 @@ const View = ({ open, onClose, data }) => {
                   <Typography sx={viewDrawerStyles.value}>{capitalize(data.name || '')}</Typography>
                 </Box>
               </Box>
-              {/* <Box mb={2} style={{ display: 'flex' }}>
-                <ArrowRightIcon fontSize="small" />
-                <Box>
-                  <Typography sx={viewDrawerStyles.label}><strong>College Code</strong></Typography>
-                  <Typography sx={viewDrawerStyles.value}>{data.code || 'N/A'}</Typography>
-                </Box>
-              </Box> */}
               <Box mb={2} style={{ display: 'flex' }}>
                 <ArrowRightIcon fontSize="small" />
                 <Box>
@@ -318,16 +311,6 @@ const View = ({ open, onClose, data }) => {
                   <Typography sx={viewDrawerStyles.value}>{data.phone || 'N/A'}</Typography>
                 </Box>
               </Box>
-            </Grid>
-
-            <Grid item xs={12} md={6}>
-              <Box mb={2} style={{ display: 'flex' }}>
-                <ArrowRightIcon fontSize="small" />
-                <Box>
-                  <Typography sx={viewDrawerStyles.label}><strong>Description</strong></Typography>
-                  <Typography sx={viewDrawerStyles.value}>{data.desc || 'N/A'}</Typography>
-                </Box>
-              </Box>
 
               <Box mb={2} style={{ display: 'flex' }}>
                 <ArrowRightIcon fontSize="small" />
@@ -342,7 +325,7 @@ const View = ({ open, onClose, data }) => {
                       ))}
                     </List>
                   ) : (
-                    <Typography sx={viewDrawerStyles.value}>N/A</Typography>
+                    <Typography sx={viewDrawerStyles.value}>No categories assigned</Typography>
                   )}
                 </Box>
               </Box>
@@ -408,6 +391,18 @@ const View = ({ open, onClose, data }) => {
                   )}
                 </Box>
               </Box>
+            </Grid>
+
+            <Grid item xs={12} md={6}>
+              <Box mb={2} style={{ display: 'flex' }}>
+                <ArrowRightIcon fontSize="small" />
+                <Box>
+                  <Typography sx={viewDrawerStyles.label}><strong>Description</strong></Typography>
+                  <Typography sx={viewDrawerStyles.value}>{data.desc || 'N/A'}</Typography>
+                </Box>
+              </Box>
+
+
             </Grid>
           </Grid>
         ) : (
