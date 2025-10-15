@@ -529,7 +529,6 @@ import * as Yup from 'yup';
 import { useDispatch, useSelector } from 'react-redux';
 import { getCountry } from '../../container/country/slice';
 import { getAllCourses } from '../../container/courses/slice';
-import { getState } from '../../container/states/slice';
 import { toast } from 'react-toastify';
 
 // Validation schema
